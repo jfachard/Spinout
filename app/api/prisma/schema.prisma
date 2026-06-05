@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  moduleFormat = "commonjs"
 }
 
 datasource db {
@@ -13,6 +14,7 @@ model User {
   email        String          @unique
   passwordHash String
   createdAt    DateTime        @default(now())
+  tokenVersion Int             @default(0)
   sessions     Session[]
   members      SessionMember[]
 }
