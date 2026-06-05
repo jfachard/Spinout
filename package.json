@@ -1,0 +1,21 @@
+{
+  "name": "spinout",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jfachard/Spinout.git"
+  },
+  "author": "jfachard",
+  "license": "ISC",
+  "devDependencies": {
+    "turbo": "^2.9.16"
+  }
+}

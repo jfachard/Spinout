@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String          @id @default(uuid())
+  username     String          @unique
+  email        String          @unique
+  passwordHash String
+  createdAt    DateTime        @default(now())
+  sessions     Session[]
+  members      SessionMember[]
+}
+
+model Session {
+  id         String          @id @default(uuid())
+  code       String          @unique
+  hostId     String
+  host       User            @relation(fields: [hostId], references: [id])
+  categories String[]
+  status     String          @default("waiting")
+  expiresAt  DateTime
+  createdAt  DateTime        @default(now())
+  members    SessionMember[]
+  spins      Spin[]
+}
+
+model SessionMember {
+  id          String       @id @default(uuid())
+  sessionId   String
+  session     Session      @relation(fields: [sessionId], references: [id])
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id])
+  guestName   String?
+  joinedAt    DateTime     @default(now())
+  preferences Preference[]
+  votes       Vote[]
+}
+
+model Preference {
+  id           String        @id @default(uuid())
+  memberId     String
+  member       SessionMember @relation(fields: [memberId], references: [id])
+  category     String
+  likedTags    String[]
+  dislikedTags String[]
+}
+
+model Activity {
+  id         String @id @default(uuid())
+  title      String
+  category   String
+  tags       String[]
+  minPlayers Int
+  maxPlayers Int
+  spins      Spin[]
+}
+
+model Spin {
+  id         String        @id @default(uuid())
+  sessionId  String
+  session    Session       @relation(fields: [sessionId], references: [id])
+  activityId String
+  activity   Activity      @relation(fields: [activityId], references: [id])
+  spinNumber Int
+  result     String        @default("pending")
+  createdAt  DateTime      @default(now())
+  votes      Vote[]
+}
+
+model Vote {
+  id        String        @id @default(uuid())
+  spinId    String
+  spin      Spin          @relation(fields: [spinId], references: [id])
+  memberId  String
+  member    SessionMember @relation(fields: [memberId], references: [id])
+  value     Boolean
+  createdAt DateTime      @default(now())
+}
