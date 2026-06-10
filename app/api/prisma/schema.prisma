@@ -51,6 +51,7 @@ model Preference {
   category     String
   likedTags    String[]
   dislikedTags String[]
+  @@unique([memberId, category])
 }
 
 model Activity {
@@ -83,4 +84,5 @@ model Vote {
   member    SessionMember @relation(fields: [memberId], references: [id])
   value     Boolean
   createdAt DateTime      @default(now())
+  @@unique([spinId, memberId])
 }

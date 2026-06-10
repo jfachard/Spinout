@@ -2,7 +2,7 @@
   "name": "spinout",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "app/*",
     "packages/*"
   ],
   "scripts": {
