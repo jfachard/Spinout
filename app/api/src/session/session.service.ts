@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
+import { ActivityService } from '../activity/activity.service'
 
 @Injectable()
 export class SessionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private activityService: ActivityService,
+  ) {}
 
   async create(hostId: string, categories: string[]) {
     const code = this.generateCode()
@@ -85,50 +89,7 @@ export class SessionService {
   }
 
   async pickActivity(sessionId: string, memberCount: number) {
-    const session = await this.prisma.session.findUnique({
-      where: { id: sessionId },
-      include: {
-        members: { include: { preferences: true } },
-        spins: true,
-      },
-    })
-
-    if (!session) throw new NotFoundException('Session not found')
-
-    const alreadySpunIds = session.spins.map(s => s.activityId)
-
-    const allLikedTags = session.members
-      .flatMap(m => m.preferences.flatMap(p => p.likedTags))
-
-    const activities = await this.prisma.activity.findMany({
-      where: {
-        id: { notIn: alreadySpunIds.length > 0 ? alreadySpunIds : undefined },
-        category: { in: session.categories.length > 0 ? session.categories : undefined },
-        minPlayers: { lte: memberCount },
-      },
-    })
-
-    if (activities.length === 0) {
-      const fallback = await this.prisma.activity.findMany({
-        where: {
-          id: { notIn: alreadySpunIds.length > 0 ? alreadySpunIds : undefined },
-          minPlayers: { lte: memberCount },
-        },
-      })
-      if (fallback.length === 0) throw new NotFoundException('No activities available')
-      return fallback[Math.floor(Math.random() * fallback.length)]
-    }
-
-    const scored = activities.map(a => ({
-      activity: a,
-      score: a.tags.filter(t => allLikedTags.includes(t)).length,
-    }))
-
-    scored.sort((a, b) => b.score - a.score)
-    const topScore = scored[0].score
-    const topActivities = scored.filter(a => a.score === topScore)
-
-    return topActivities[Math.floor(Math.random() * topActivities.length)].activity
+    return this.activityService.pickActivity(sessionId, memberCount)
   }
 
   async recordSpin(sessionId: string, activityId: string, spinNumber: number) {
