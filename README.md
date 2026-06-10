@@ -106,6 +106,7 @@ JWT_SECRET="your-jwt-secret"
 cd apps/api
 npx prisma migrate dev
 npx prisma generate
+npx prisma db seed
 ```
 
 ### Run in development
@@ -174,15 +175,31 @@ Key design decisions:
 
 ## Roadmap
 
-- [ ] Auth module (register / login / JWT)
-- [ ] Session CRUD (create, join, close)
-- [ ] Socket.io gateway (lobby + session)
-- [ ] Activity seeding
-- [ ] Roulette algorithm (preference-based filtering)
-- [ ] Web UI (Next.js)
-- [ ] Mobile UI (Expo)
-- [ ] Push notifications (mobile)
+### ✅ Milestone 1 — API Core
+- [x] JWT auth (register, login, refresh, logout) with bcrypt + tokenVersion
+- [x] Session CRUD (create, join, close) with guest support and 6-char code
+- [x] Socket.io gateway — full lobby and game event flow
+- [x] Preference-based roulette algorithm with session history filtering
+- [x] Activity seeding — 49 activities across 7 categories
+- [x] Shared TypeScript types and Socket.io event constants (`@spinout/shared`)
+
+### 🚧 Milestone 2 — Web (Next.js)
+- [ ] Auth pages (register / login)
+- [ ] Home page (create / join session)
+- [ ] Lobby page (members, preferences, QR code)
+- [ ] Game page (roulette animation, vote panel)
 - [ ] Session history page
+
+### 🔲 Milestone 3 — Mobile (Expo)
+- [ ] Navigation setup (Expo Router)
+- [ ] Home screen (create / join / QR scanner)
+- [ ] Lobby screen
+- [ ] Game screen (roulette + vote)
+- [ ] Push notifications
+
+### 🔲 Milestone 4 — Shared & DevOps
+- [ ] Deploy API on Railway
+- [ ] Deploy web on Vercel
 
 ---
 
