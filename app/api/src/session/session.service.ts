@@ -141,6 +141,17 @@ export class SessionService {
     })
   }
 
+  async getHistoryByCode(code: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { code },
+      select: { id: true, code: true, status: true },
+    })
+    if (!session) throw new NotFoundException('Session not found')
+
+    const spins = await this.getSessionHistory(session.id)
+    return { session, spins }
+  }
+
   private generateCode(): string {
     return Math.random().toString(36).substring(2, 8).toUpperCase()
   }

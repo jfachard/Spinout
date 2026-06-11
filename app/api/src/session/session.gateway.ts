@@ -88,6 +88,21 @@ export class SessionGateway implements OnGatewayDisconnect {
     })
   }
 
+  @SubscribeMessage(SESSION_EVENTS.JOIN)
+  async handleSessionJoin(
+    @MessageBody() body: { code: string; memberId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const member = await this.session.findMember(body.memberId, body.code)
+    if (!member) {
+      client.emit('session:error', { message: 'Not a member of this session' })
+      return
+    }
+
+    client.join(`session:${body.code}`)
+    this.socketToMember.set(client.id, { memberId: body.memberId, sessionCode: body.code })
+  }
+
   @SubscribeMessage(LOBBY_EVENTS.START)
   async handleLobbyStart(
     @MessageBody() body: { sessionId: string; hostId: string },

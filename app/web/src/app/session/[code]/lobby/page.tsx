@@ -22,7 +22,7 @@ import {
   CategoryChip,
   type CategoryKey,
 } from "@/components/ui/CategoryChip";
-import { getSocket, disconnectSocket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import { getMembership } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
@@ -172,7 +172,6 @@ export default function LobbyPage({
       socket.off(LOBBY_EVENTS.PREF_UPDATED, handlePrefUpdated);
       socket.off(SESSION_EVENTS.STARTED, handleStarted);
       socket.off("lobby:error", handleError);
-      disconnectSocket();
     };
   }, [code, router]);
 
@@ -310,10 +309,10 @@ export default function LobbyPage({
                     return (
                       <li
                         key={m.id}
-                        className="flex items-center justify-between gap-3 bg-paper border-[2px] border-ink rounded-lg px-3 py-2"
+                        className="flex items-center justify-between gap-3 bg-paper border-2 border-ink rounded-lg px-3 py-2"
                       >
                         <span className="flex items-center gap-2 font-body font-bold text-ink">
-                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber/30 border-[2px] border-ink font-display text-sm">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber/30 border-2 border-ink font-display text-sm">
                             {memberName(m).charAt(0).toUpperCase()}
                           </span>
                           {memberName(m)}
@@ -330,7 +329,7 @@ export default function LobbyPage({
                         </span>
                         <span
                           className={cn(
-                            "font-body font-bold text-xs px-2 py-0.5 rounded-full border-[2px] border-ink",
+                            "font-body font-bold text-xs px-2 py-0.5 rounded-full border-2 border-ink",
                             ready
                               ? "bg-[#7A9A52] text-white"
                               : "bg-surface text-muted",
@@ -397,7 +396,7 @@ export default function LobbyPage({
               </div>
 
               {activeCategory ? (
-                <div className="flex flex-col gap-4 bg-paper border-[2px] border-ink rounded-xl p-4">
+                <div className="flex flex-col gap-4 bg-paper border-2 border-ink rounded-xl p-4">
                   <div className="flex flex-wrap gap-2">
                     {CATEGORY_TAGS[activeCategory].map((tag) => {
                       const state = tagStates[tag];
@@ -407,7 +406,7 @@ export default function LobbyPage({
                           type="button"
                           onClick={() => cycleTag(tag)}
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-body font-bold text-sm border-[2px] border-ink shadow-sticker-sm cursor-pointer select-none transition-[transform,box-shadow] duration-75 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-body font-bold text-sm border-2 border-ink shadow-sticker-sm cursor-pointer select-none transition-[transform,box-shadow] duration-75 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
                             state === "like" && "bg-[#7A9A52] text-white",
                             state === "dislike" && "bg-primary text-white",
                             !state && "bg-surface text-ink",
@@ -445,7 +444,7 @@ export default function LobbyPage({
                   </div>
                 </div>
               ) : (
-                <p className="font-body text-sm text-muted bg-paper border-[2px] border-dashed border-muted rounded-xl px-4 py-6 text-center">
+                <p className="font-body text-sm text-muted bg-paper border-2 border-dashed border-muted rounded-xl px-4 py-6 text-center">
                   Select a category above to set your taste.
                 </p>
               )}

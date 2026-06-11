@@ -47,7 +47,7 @@ export function CategoryChip({
         "inline-flex items-center gap-1.5",
         "px-3 py-1 rounded-full",
         "font-body font-bold text-sm",
-        "border-[2px] border-ink shadow-sticker-sm",
+        "border-2 border-ink shadow-sticker-sm",
         "cursor-pointer select-none outline-none",
         "transition-[transform,box-shadow,background-color,color] duration-75 ease-out",
         "active:translate-x-[2.5px] active:translate-y-[2.5px] active:shadow-none",

@@ -59,6 +59,36 @@ export function createSession(categories: string[] = []) {
   });
 }
 
+export function fetchSession(code: string) {
+  return apiFetch<Session>(`/session/${code.trim().toUpperCase()}`);
+}
+
+export interface HistorySpin {
+  id: string;
+  spinNumber: number;
+  result: string;
+  activity: {
+    id: string;
+    title: string;
+    category: string;
+    tags: string[];
+    minPlayers: number;
+    maxPlayers: number;
+  };
+  votes: { value: boolean }[];
+}
+
+export interface SessionHistory {
+  session: { id: string; code: string; status: string };
+  spins: HistorySpin[];
+}
+
+export function fetchSessionHistory(code: string) {
+  return apiFetch<SessionHistory>(
+    `/session/${code.trim().toUpperCase()}/history`,
+  );
+}
+
 export function joinSession(code: string, guestName?: string) {
   const normalizedCode = code.trim().toUpperCase();
   const body = JSON.stringify({ code: normalizedCode, guestName });

@@ -41,6 +41,11 @@ export class SessionController {
     return this.session.findByCode(code)
   }
 
+  @Get(':code/history')
+  history(@Param('code') code: string) {
+    return this.session.getHistoryByCode(code)
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post(':id/close')
   close(@Param('id') id: string, @Req() req: any) {

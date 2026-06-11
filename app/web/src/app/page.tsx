@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Disc3, type LucideIcon, Rocket, Sparkles, Vote } from "lucide-react";
+import {
+  Disc3,
+  History,
+  type LucideIcon,
+  Rocket,
+  Sparkles,
+  Vote,
+} from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Wheel } from "@/components/Wheel";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -10,7 +18,12 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ApiError } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { createSession, joinSession, storeMembership } from "@/lib/session";
+import {
+  createSession,
+  getMembership,
+  joinSession,
+  storeMembership,
+} from "@/lib/session";
 
 const CODE_RE = /^[A-Z0-9]{6}$/;
 
@@ -29,9 +42,11 @@ export default function HomePage() {
 
   const [joinOpen, setJoinOpen] = useState(false);
   const [initialCode, setInitialCode] = useState("");
+  const [lastCode, setLastCode] = useState<string | null>(null);
 
   useEffect(() => {
     setAuthed(isAuthenticated());
+    setLastCode(getMembership()?.code ?? null);
 
     const params = new URLSearchParams(window.location.search);
     const join = params.get("join");
@@ -97,6 +112,16 @@ export default function HomePage() {
                 Join with a code
               </Button>
             </div>
+
+            {lastCode && (
+              <Link
+                href={`/session/${lastCode}/history`}
+                className="self-start inline-flex items-center gap-2 font-body font-bold text-sm text-subtle hover:text-ink transition-colors"
+              >
+                <History size={16} strokeWidth={2.5} />
+                View last session history ({lastCode})
+              </Link>
+            )}
 
             {createError && (
               <p

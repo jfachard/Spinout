@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Dumbbell,
@@ -41,11 +42,30 @@ function conicGradient() {
 interface WheelProps {
   size?: number;
   spinning?: boolean;
+  /** Spin-to-stop duration in ms. Should match the reveal delay on the game page. */
+  durationMs?: number;
   className?: string;
 }
 
-export function Wheel({ size = 360, spinning = false, className }: WheelProps) {
+export function Wheel({
+  size = 360,
+  spinning = false,
+  durationMs = 4000,
+  className,
+}: WheelProps) {
   const radiusPct = 33;
+  const [rotation, setRotation] = useState(0);
+  const wasSpinning = useRef(false);
+
+  useEffect(() => {
+    if (spinning && !wasSpinning.current) {
+      // 5–7 full turns + random landing offset so it stops somewhere new each time.
+      const turns = 5 + Math.floor(Math.random() * 3);
+      const offset = Math.random() * 360;
+      setRotation((r) => r + turns * 360 + offset);
+    }
+    wasSpinning.current = spinning;
+  }, [spinning]);
 
   return (
     <div
@@ -67,11 +87,12 @@ export function Wheel({ size = 360, spinning = false, className }: WheelProps) {
 
       {/* Wheel disc */}
       <div
-        className={cn(
-          "absolute inset-0 rounded-full border-[2.5px] border-ink shadow-sticker-lg",
-          spinning && "animate-spin-wheel",
-        )}
-        style={{ background: conicGradient() }}
+        className="absolute inset-0 rounded-full border-[2.5px] border-ink shadow-sticker-lg"
+        style={{
+          background: conicGradient(),
+          transform: `rotate(${rotation}deg)`,
+          transition: `transform ${durationMs}ms cubic-bezier(0.18, 0.9, 0.2, 1)`,
+        }}
       >
         {SEGMENTS.map((s, i) => {
           const angle = (i * SLICE + SLICE / 2) * (Math.PI / 180);
