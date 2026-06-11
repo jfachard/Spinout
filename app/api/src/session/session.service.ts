@@ -51,6 +51,17 @@ export class SessionService {
     return { session, member }
   }
 
+  async findMember(memberId: string, code: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { code },
+      select: { id: true },
+    })
+    if (!session) return null
+    return this.prisma.sessionMember.findFirst({
+      where: { id: memberId, sessionId: session.id },
+    })
+  }
+
   async findByCode(code: string) {
     const session = await this.prisma.session.findUnique({
       where: { code },

@@ -1,13 +1,22 @@
 import { Controller, Post, Get, Body, Param, Req, UseGuards } from '@nestjs/common'
+import { IsArray, IsOptional, IsString, IsNotEmpty } from 'class-validator'
 import { SessionService } from './session.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 
 class CreateSessionDto {
-  categories!: string[]
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  categories: string[] = []
 }
 
 class JoinSessionDto {
+  @IsString()
+  @IsNotEmpty()
   code!: string
+
+  @IsString()
+  @IsOptional()
   guestName?: string
 }
 

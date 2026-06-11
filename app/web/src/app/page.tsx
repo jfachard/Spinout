@@ -28,9 +28,17 @@ export default function HomePage() {
   const [createError, setCreateError] = useState<string | null>(null);
 
   const [joinOpen, setJoinOpen] = useState(false);
+  const [initialCode, setInitialCode] = useState("");
 
   useEffect(() => {
     setAuthed(isAuthenticated());
+
+    const params = new URLSearchParams(window.location.search);
+    const join = params.get("join");
+    if (join && CODE_RE.test(join.toUpperCase())) {
+      setInitialCode(join.toUpperCase());
+      setJoinOpen(true);
+    }
   }, []);
 
   async function handleCreate() {
@@ -42,6 +50,10 @@ export default function HomePage() {
     setCreating(true);
     try {
       const session = await createSession([]);
+      const hostMember = session.members?.[0];
+      if (hostMember) {
+        storeMembership({ code: session.code, memberId: hostMember.id });
+      }
       router.push(`/session/${session.code}/lobby`);
     } catch (err) {
       setCreateError(
@@ -125,6 +137,7 @@ export default function HomePage() {
       {joinOpen && (
         <JoinModal
           authed={authed}
+          initialCode={initialCode}
           onClose={() => setJoinOpen(false)}
           onJoined={(code) => router.push(`/session/${code}/lobby`)}
         />
@@ -135,14 +148,16 @@ export default function HomePage() {
 
 function JoinModal({
   authed,
+  initialCode = "",
   onClose,
   onJoined,
 }: {
   authed: boolean;
+  initialCode?: string;
   onClose: () => void;
   onJoined: (code: string) => void;
 }) {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(initialCode);
   const [guestName, setGuestName] = useState("");
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
