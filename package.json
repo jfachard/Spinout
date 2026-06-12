@@ -2,6 +2,9 @@
   "name": "spinout",
   "private": true,
   "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=20"
+  },
   "workspaces": [
     "app/*",
     "packages/*"
