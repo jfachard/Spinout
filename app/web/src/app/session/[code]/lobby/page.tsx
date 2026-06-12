@@ -94,7 +94,10 @@ export default function LobbyPage({
     return !!me?.userId && me.userId === session.hostId;
   }, [session, myMemberId, members]);
 
-  const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/?join=${code}`;
+  const [joinUrl, setJoinUrl] = useState("");
+  useEffect(() => {
+    setJoinUrl(`${window.location.origin}/?join=${code}`);
+  }, [code]);
 
   useEffect(() => {
     const membership = getMembership();
@@ -355,7 +358,11 @@ export default function LobbyPage({
                   Invite friends
                 </h2>
                 <div className="bg-white border-[2.5px] border-ink rounded-xl p-3 shadow-sticker-sm">
-                  <QRCodeSVG value={joinUrl} size={150} fgColor="#3a2a24" />
+                  {joinUrl ? (
+                    <QRCodeSVG value={joinUrl} size={150} fgColor="#3a2a24" />
+                  ) : (
+                    <div className="w-[150px] h-[150px]" />
+                  )}
                 </div>
                 <p className="font-body text-sm text-subtle">
                   Scan to join with code{" "}
