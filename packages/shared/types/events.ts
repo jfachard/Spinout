@@ -9,6 +9,7 @@ export const LOBBY_EVENTS = {
 } as const
 
 export const SESSION_EVENTS = {
+  JOIN: 'session:join',
   STARTED: 'session:started',
   SPIN: 'session:spin',
   ACTIVITY: 'session:activity',

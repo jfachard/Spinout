@@ -51,6 +51,17 @@ export class SessionService {
     return { session, member }
   }
 
+  async findMember(memberId: string, code: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { code },
+      select: { id: true },
+    })
+    if (!session) return null
+    return this.prisma.sessionMember.findFirst({
+      where: { id: memberId, sessionId: session.id },
+    })
+  }
+
   async findByCode(code: string) {
     const session = await this.prisma.session.findUnique({
       where: { code },
@@ -128,6 +139,17 @@ export class SessionService {
       include: { activity: true, votes: true },
       orderBy: { spinNumber: 'asc' },
     })
+  }
+
+  async getHistoryByCode(code: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { code },
+      select: { id: true, code: true, status: true },
+    })
+    if (!session) throw new NotFoundException('Session not found')
+
+    const spins = await this.getSessionHistory(session.id)
+    return { session, spins }
   }
 
   private generateCode(): string {

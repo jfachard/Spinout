@@ -32,23 +32,39 @@ export class SessionGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage(LOBBY_EVENTS.JOIN)
   async handleLobbyJoin(
-    @MessageBody() body: { code: string; userId?: string; guestName?: string },
+    @MessageBody() body: { code: string; memberId?: string; userId?: string; guestName?: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const { session, member } = await this.session.join(body.code, body.userId, body.guestName)
-    const fullSession = await this.session.findByCode(body.code)
+    try {
+      // Reuse an existing member (REST create/join already inserted one) to avoid duplicates.
+      let memberId = body.memberId
+        ? (await this.session.findMember(body.memberId, body.code))?.id
+        : undefined
 
-    client.join(`lobby:${body.code}`)
-    this.socketToMember.set(client.id, { memberId: member.id, sessionCode: body.code })
+      if (!memberId) {
+        const { member } = await this.session.join(body.code, body.userId, body.guestName)
+        memberId = member.id
+      }
 
-    client.emit(LOBBY_EVENTS.JOINED, {
-      session: fullSession,
-      members: fullSession.members,
-    })
+      const fullSession = await this.session.findByCode(body.code)
 
-    client.to(`lobby:${body.code}`).emit(LOBBY_EVENTS.MEMBER_JOINED, {
-      member,
-    })
+      client.join(`lobby:${body.code}`)
+      this.socketToMember.set(client.id, { memberId, sessionCode: body.code })
+
+      client.emit(LOBBY_EVENTS.JOINED, {
+        session: fullSession,
+        members: fullSession.members,
+        memberId,
+      })
+
+      client.to(`lobby:${body.code}`).emit(LOBBY_EVENTS.MEMBER_JOINED, {
+        members: fullSession.members,
+      })
+    } catch (err) {
+      client.emit('lobby:error', {
+        message: err instanceof Error ? err.message : 'Could not join the lobby',
+      })
+    }
   }
 
   @SubscribeMessage(LOBBY_EVENTS.SET_PREFS)
@@ -70,6 +86,21 @@ export class SessionGateway implements OnGatewayDisconnect {
       memberId: body.memberId,
       pref,
     })
+  }
+
+  @SubscribeMessage(SESSION_EVENTS.JOIN)
+  async handleSessionJoin(
+    @MessageBody() body: { code: string; memberId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const member = await this.session.findMember(body.memberId, body.code)
+    if (!member) {
+      client.emit('session:error', { message: 'Not a member of this session' })
+      return
+    }
+
+    client.join(`session:${body.code}`)
+    this.socketToMember.set(client.id, { memberId: body.memberId, sessionCode: body.code })
   }
 
   @SubscribeMessage(LOBBY_EVENTS.START)
