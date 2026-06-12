@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build --workspace=@spinout/api"
+
+[deploy]
+startCommand = "node app/api/dist/src/main"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
