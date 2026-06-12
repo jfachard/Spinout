@@ -52,7 +52,7 @@ export default function HistoryPage({
       })
       .catch((err) => {
         if (cancelled || raw) return;
-        setError(err instanceof Error ? err.message : "Session introuvable");
+        setError(err instanceof Error ? err.message : "Session not found");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

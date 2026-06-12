@@ -256,7 +256,7 @@ export default function LobbyPage({
     <div className="flex flex-1 flex-col">
       <Navbar />
 
-      <main className="flex-1 w-full max-w-[1120px] mx-auto px-7 py-8 lg:py-10">
+      <main className="flex-1 w-full max-w-[1120px] mx-auto px-4 sm:px-7 py-6 sm:py-8 lg:py-10">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div className="flex flex-col gap-1">

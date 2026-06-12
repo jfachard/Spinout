@@ -174,7 +174,7 @@ export default function GamePage({
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Session introuvable");
+        setError(err instanceof Error ? err.message : "Session not found");
         setConnecting(false);
       });
 
@@ -243,7 +243,7 @@ export default function GamePage({
     <div className="flex flex-1 flex-col">
       <Navbar />
 
-      <main className="flex-1 w-full max-w-[1120px] mx-auto px-7 py-8 lg:py-10">
+      <main className="flex-1 w-full max-w-[1120px] mx-auto px-4 sm:px-7 py-6 sm:py-8 lg:py-10">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div className="flex flex-col gap-1">
             <span className="inline-flex items-center gap-2 self-start bg-primary/15 border-[2.5px] border-ink rounded-full px-3 py-1 font-body font-bold text-xs text-ink">
@@ -279,10 +279,16 @@ export default function GamePage({
           {/* Wheel */}
           <div className="flex flex-col items-center gap-6">
             <Wheel
+              size={240}
+              spinning={spinning}
+              durationMs={MIN_SPIN_MS}
+              className={cn("sm:hidden", phase === "result" && voteResult === "accepted" && "animate-floaty")}
+            />
+            <Wheel
               size={320}
               spinning={spinning}
               durationMs={MIN_SPIN_MS}
-              className={cn(phase === "result" && voteResult === "accepted" && "animate-floaty")}
+              className={cn("hidden sm:block", phase === "result" && voteResult === "accepted" && "animate-floaty")}
             />
 
             {isHost && phase !== "spinning" && phase !== "voting" && (
