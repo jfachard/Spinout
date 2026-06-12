@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
 import { ActivityModule } from './activity/activity.module';
 import { ThrottlerModule } from '@nestjs/throttler'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 
 
 @Module({
@@ -19,5 +21,7 @@ import { ThrottlerModule } from '@nestjs/throttler'
       limit: 30,
     }]),
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
