@@ -82,16 +82,16 @@ export default function HomePage() {
     <div className="flex flex-1 flex-col">
       <Navbar />
 
-      <main className="flex-1 w-full max-w-[1120px] mx-auto px-7">
-        <div className="grid lg:grid-cols-2 gap-10 items-center py-10 lg:py-16">
+      <main className="flex-1 w-full max-w-[1120px] mx-auto px-4 sm:px-7">
+        <div className="grid lg:grid-cols-2 gap-10 items-center py-8 lg:py-16">
           {/* Left */}
-          <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-6 lg:gap-7">
             <span className="self-start inline-flex items-center gap-2 bg-surface border-[2.5px] border-ink rounded-full px-4 py-1.5 font-body font-bold text-sm text-subtle shadow-sticker-sm">
               <Sparkles size={16} strokeWidth={2.5} className="text-amber" />
               for friend groups who can&apos;t decide
             </span>
 
-            <h1 className="text-5xl lg:text-6xl font-display font-extrabold text-ink leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-ink leading-[1.05]">
               Stop asking
               <br />
               &ldquo;what do we
@@ -132,7 +132,7 @@ export default function HomePage() {
               </p>
             )}
 
-            <div className="grid grid-cols-3 gap-4 pt-2 max-w-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 max-w-xl">
               {FEATURES.map((f) => {
                 const { Icon } = f;
                 return (
@@ -154,7 +154,8 @@ export default function HomePage() {
 
           {/* Right */}
           <div className="flex justify-center lg:justify-end">
-            <Wheel size={380} className="animate-floaty" />
+            <Wheel size={260} className="animate-floaty sm:hidden" />
+            <Wheel size={380} className="animate-floaty hidden sm:block" />
           </div>
         </div>
       </main>

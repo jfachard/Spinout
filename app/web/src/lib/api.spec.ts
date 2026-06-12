@@ -39,7 +39,7 @@ describe('apiFetch', () => {
 
     await expect(apiFetch('/test')).rejects.toMatchObject({
       status: 0,
-      message: expect.stringContaining('serveur'),
+      message: expect.stringContaining('server'),
     })
   })
 
@@ -77,9 +77,9 @@ describe('apiFetch', () => {
     await expect(apiFetch('/test')).rejects.toMatchObject({ message: 'Unauthorized' })
   })
 
-  it('falls back to "Erreur N" when the body has no message or error', async () => {
+  it('falls back to "Error N" when the body has no message or error', async () => {
     mockFetch.mockResolvedValue(makeResponse(503, {}))
-    await expect(apiFetch('/test')).rejects.toMatchObject({ message: 'Erreur 503' })
+    await expect(apiFetch('/test')).rejects.toMatchObject({ message: 'Error 503' })
   })
 
   it('handles non-JSON error responses gracefully', async () => {

@@ -18,7 +18,7 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   title: "Spinout — Social Activity Roulette",
-  description: "Découvre ta prochaine activité avec tes amis",
+  description: "Discover your next activity with your friends",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fr"
+      lang="en"
       suppressHydrationWarning
       className={`${baloo2.variable} ${nunito.variable} h-full antialiased`}
     >

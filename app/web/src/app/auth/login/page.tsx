@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { ApiError } from "@/lib/api";
 import { login as loginUser, storeTokens } from "@/lib/auth";
 import { loginSchema, type LoginValues } from "@/lib/validation";
+import { ApiStatus } from "@/components/ui/ApiStatus";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,25 +36,25 @@ export default function LoginPage() {
       if (err instanceof ApiError) {
         setFormError(
           err.status === 401
-            ? "Email ou mot de passe incorrect."
+            ? "Incorrect email or password."
             : err.message,
         );
       } else {
-        setFormError("Une erreur est survenue. Réessaie.");
+        setFormError("Something went wrong. Please try again.");
       }
     }
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center px-7 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center gap-5 px-4 sm:px-7 py-10 sm:py-12">
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col gap-6 p-7">
           <div className="flex flex-col gap-1">
             <h1 className="text-3xl font-display font-bold text-ink">
-              Bon retour
+              Welcome back
             </h1>
             <p className="font-body text-subtle">
-              Connecte-toi pour reprendre la partie.
+              Sign in to pick up where you left off.
             </p>
           </div>
 
@@ -66,15 +67,15 @@ export default function LoginPage() {
               label="Email"
               type="email"
               autoComplete="email"
-              placeholder="toi@exemple.com"
+              placeholder="john@example.com"
               error={errors.email?.message}
               {...register("email")}
             />
             <Input
-              label="Mot de passe"
+              label="Password"
               type="password"
               autoComplete="current-password"
-              placeholder="Ton mot de passe"
+              placeholder="Your password"
               error={errors.password?.message}
               {...register("password")}
             />
@@ -89,21 +90,22 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Connexion..." : "Se connecter"}
+              {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
           <p className="font-body text-sm text-subtle text-center">
-            Pas encore de compte ?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/auth/register"
               className="font-bold text-primary underline-offset-2 hover:underline"
             >
-              Créer un compte
+              Create an account
             </Link>
           </p>
         </CardContent>
       </Card>
+      <ApiStatus />
     </main>
   );
 }

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { ApiError } from "@/lib/api";
 import { register as registerUser, storeTokens } from "@/lib/auth";
 import { registerSchema, type RegisterValues } from "@/lib/validation";
+import { ApiStatus } from "@/components/ui/ApiStatus";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,25 +36,25 @@ export default function RegisterPage() {
       if (err instanceof ApiError) {
         setFormError(
           err.status === 409
-            ? "Cet email ou nom d'utilisateur existe déjà."
+            ? "This email or username is already taken."
             : err.message,
         );
       } else {
-        setFormError("Une erreur est survenue. Réessaie.");
+        setFormError("Something went wrong. Please try again.");
       }
     }
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center px-7 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center gap-5 px-4 sm:px-7 py-10 sm:py-12">
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col gap-6 p-7">
           <div className="flex flex-col gap-1">
             <h1 className="text-3xl font-display font-bold text-ink">
-              Créer un compte
+              Create an account
             </h1>
             <p className="font-body text-subtle">
-              Rejoins Spinout et lance ta première roulette.
+              Join Spinout and spin your first wheel.
             </p>
           </div>
 
@@ -63,10 +64,10 @@ export default function RegisterPage() {
             noValidate
           >
             <Input
-              label="Nom d'utilisateur"
+              label="Username"
               type="text"
               autoComplete="username"
-              placeholder="ton_pseudo"
+              placeholder="your_username"
               error={errors.username?.message}
               {...register("username")}
             />
@@ -74,15 +75,15 @@ export default function RegisterPage() {
               label="Email"
               type="email"
               autoComplete="email"
-              placeholder="toi@exemple.com"
+              placeholder="john@example.com"
               error={errors.email?.message}
               {...register("email")}
             />
             <Input
-              label="Mot de passe"
+              label="Password"
               type="password"
               autoComplete="new-password"
-              placeholder="8 caractères minimum"
+              placeholder="8 characters minimum"
               error={errors.password?.message}
               {...register("password")}
             />
@@ -97,21 +98,22 @@ export default function RegisterPage() {
             )}
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Création..." : "Créer mon compte"}
+              {isSubmitting ? "Creating..." : "Create my account"}
             </Button>
           </form>
 
           <p className="font-body text-sm text-subtle text-center">
-            Déjà un compte ?{" "}
+            Already have an account?{" "}
             <Link
               href="/auth/login"
               className="font-bold text-primary underline-offset-2 hover:underline"
             >
-              Se connecter
+              Sign in
             </Link>
           </p>
         </CardContent>
       </Card>
+      <ApiStatus />
     </main>
   );
 }

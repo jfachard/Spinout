@@ -38,7 +38,7 @@ export async function apiFetch<T>(
       },
     });
   } catch {
-    throw new ApiError(0, "Impossible de joindre le serveur. Réessaie.");
+    throw new ApiError(0, "Unable to reach the server. Please try again.");
   }
 
   const isJson = res.headers
@@ -49,7 +49,7 @@ export async function apiFetch<T>(
   if (!res.ok) {
     throw new ApiError(
       res.status,
-      extractMessage(body, `Erreur ${res.status}`),
+      extractMessage(body, `Error ${res.status}`),
     );
   }
 
