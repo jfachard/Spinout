@@ -60,13 +60,13 @@ let refreshPromise: Promise<AuthTokens> | null = null;
 export async function refreshTokens(): Promise<AuthTokens> {
   if (refreshPromise) return refreshPromise;
 
-  refreshPromise = (async () => {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-      clearTokens();
-      throw new ApiError(401, "Session expirée");
-    }
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    clearTokens();
+    throw new ApiError(401, "Session expirée");
+  }
 
+  refreshPromise = (async () => {
     try {
       const tokens = await apiFetch<AuthTokens>("/auth/refresh", {
         method: "POST",

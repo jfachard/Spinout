@@ -16,7 +16,7 @@ describe('SessionService', () => {
         findUnique: jest.fn(),
         update: jest.fn(),
       },
-      sessionMember: { create: jest.fn() },
+      sessionMember: { create: jest.fn(), findFirst: jest.fn() },
       preference: { upsert: jest.fn() },
       spin: { create: jest.fn(), update: jest.fn(), findMany: jest.fn() },
       vote: { upsert: jest.fn(), findMany: jest.fn() },
@@ -218,6 +218,55 @@ describe('SessionService', () => {
         expect.objectContaining({ orderBy: { spinNumber: 'asc' } }),
       )
       expect(result).toEqual(history)
+    })
+  })
+
+  describe('findMember', () => {
+    it('returns null when the session does not exist', async () => {
+      prisma.session.findUnique.mockResolvedValue(null)
+      const result = await service.findMember('m1', 'NOPE')
+      expect(result).toBeNull()
+      expect(prisma.sessionMember.findFirst).not.toHaveBeenCalled()
+    })
+
+    it('returns the member when session and member both exist', async () => {
+      const member = { id: 'm1', sessionId: 's1' }
+      prisma.session.findUnique.mockResolvedValue({ id: 's1' })
+      prisma.sessionMember.findFirst.mockResolvedValue(member)
+
+      const result = await service.findMember('m1', 'ABC')
+      expect(prisma.sessionMember.findFirst).toHaveBeenCalledWith({
+        where: { id: 'm1', sessionId: 's1' },
+      })
+      expect(result).toEqual(member)
+    })
+
+    it('returns null when member does not belong to the session', async () => {
+      prisma.session.findUnique.mockResolvedValue({ id: 's1' })
+      prisma.sessionMember.findFirst.mockResolvedValue(null)
+
+      const result = await service.findMember('stranger', 'ABC')
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('getHistoryByCode', () => {
+    it('throws NotFoundException when session does not exist', async () => {
+      prisma.session.findUnique.mockResolvedValue(null)
+      await expect(service.getHistoryByCode('NOPE')).rejects.toThrow(NotFoundException)
+    })
+
+    it('returns session metadata and spins when found', async () => {
+      const session = { id: 's1', code: 'ABC', status: 'closed' }
+      const spins = [{ id: 'sp1', spinNumber: 1 }, { id: 'sp2', spinNumber: 2 }]
+      prisma.session.findUnique.mockResolvedValue(session)
+      prisma.spin.findMany.mockResolvedValue(spins)
+
+      const result = await service.getHistoryByCode('ABC')
+      expect(result).toEqual({ session, spins })
+      expect(prisma.spin.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { sessionId: 's1' }, orderBy: { spinNumber: 'asc' } }),
+      )
     })
   })
 })
