@@ -131,6 +131,10 @@ export class SessionGateway implements OnGatewayDisconnect {
     const fullSession = await this.session.findByCode(data.sessionCode)
     if (fullSession.hostId !== body.hostId) return
 
+    // Tell every member to start the wheel animation immediately, before the
+    // (potentially slow) activity pick resolves.
+    this.server.to(`session:${data.sessionCode}`).emit(SESSION_EVENTS.SPIN_STARTED)
+
     const memberCount = fullSession.members.length
     const activity = await this.session.pickActivity(body.sessionId, memberCount)
     const spinNumber = fullSession.spins?.length ?? 0

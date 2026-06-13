@@ -94,6 +94,18 @@ export default function GamePage({
     let cancelled = false;
     const socket = getSocket();
 
+    function handleSpinStarted() {
+      spinStartedAt.current = Date.now();
+      if (revealTimer.current) clearTimeout(revealTimer.current);
+      setActivity(null);
+      setSpinId(null);
+      setVotes({ yes: 0, no: 0, total: 0 });
+      setMyVote(null);
+      setVoteResult(null);
+      setSpinning(true);
+      setPhase("spinning");
+    }
+
     function revealActivity(payload: {
       activity: ActivityDto;
       spinId: string;
@@ -148,6 +160,7 @@ export default function GamePage({
       setConnecting(false);
     }
 
+    socket.on(SESSION_EVENTS.SPIN_STARTED, handleSpinStarted);
     socket.on(SESSION_EVENTS.ACTIVITY, revealActivity);
     socket.on(SESSION_EVENTS.VOTE_UPDATE, handleVoteUpdate);
     socket.on(SESSION_EVENTS.VOTE_RESULT, handleVoteResult);
@@ -181,6 +194,7 @@ export default function GamePage({
     return () => {
       cancelled = true;
       if (revealTimer.current) clearTimeout(revealTimer.current);
+      socket.off(SESSION_EVENTS.SPIN_STARTED, handleSpinStarted);
       socket.off(SESSION_EVENTS.ACTIVITY, revealActivity);
       socket.off(SESSION_EVENTS.VOTE_UPDATE, handleVoteUpdate);
       socket.off(SESSION_EVENTS.VOTE_RESULT, handleVoteResult);
