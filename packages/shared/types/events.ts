@@ -12,6 +12,7 @@ export const SESSION_EVENTS = {
   JOIN: 'session:join',
   STARTED: 'session:started',
   SPIN: 'session:spin',
+  SPIN_STARTED: 'session:spin_started',
   ACTIVITY: 'session:activity',
   VOTE: 'session:vote',
   VOTE_UPDATE: 'session:vote_update',
