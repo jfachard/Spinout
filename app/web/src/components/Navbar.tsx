@@ -9,7 +9,6 @@ const DEFAULT_NAV = [{ label: "Home", href: "/" }];
 
 function sessionNav(code: string) {
   return [
-    { label: "Home", href: "/" },
     { label: "Lobby", href: `/session/${code}/lobby` },
     { label: "Game", href: `/session/${code}/game` },
     { label: "History", href: `/session/${code}/history` },
