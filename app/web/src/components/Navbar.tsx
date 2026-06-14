@@ -64,8 +64,8 @@ export function Navbar() {
         </nav>
 
         {sessionCode && (
-          <div className="ml-auto flex items-center gap-2 shrink-0">
-            <span className="font-body font-extrabold text-xs text-muted hidden sm:block">
+          <div className="ml-auto hidden sm:flex items-center gap-2 shrink-0">
+            <span className="font-body font-extrabold text-xs text-muted">
               CODE
             </span>
             <span className="font-display font-extrabold text-sm tracking-[0.14em] bg-ink text-paper px-3 py-1.5 rounded-[10px]">
