@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Dumbbell,
+  Flower2,
+  House,
+  type LucideIcon,
+  Palette,
+  PartyPopper,
+  TreePine,
+  UtensilsCrossed,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type CategoryKey =
@@ -13,15 +23,25 @@ export type CategoryKey =
 
 export const CATEGORY_META: Record<
   CategoryKey,
-  { label: string; emoji: string; color: string }
+  { label: string; color: string }
 > = {
-  indoor:     { label: "Indoor",     emoji: "🏠", color: "#E8643C" },
-  outdoor:    { label: "Outdoor",    emoji: "🌿", color: "#7A9A52" },
-  sport:      { label: "Sport",      emoji: "⚡", color: "#F2A03D" },
-  relaxation: { label: "Relaxation", emoji: "🧘", color: "#6F94A8" },
-  party:      { label: "Fête",       emoji: "🎉", color: "#D1688A" },
-  culture:    { label: "Culture",    emoji: "🎨", color: "#9B72CF" },
-  food:       { label: "Food",       emoji: "🍕", color: "#C98A3A" },
+  indoor:     { label: "Indoor",  color: "#E8643C" },
+  outdoor:    { label: "Outdoor", color: "#7A9A52" },
+  sport:      { label: "Sport",   color: "#F2A03D" },
+  relaxation: { label: "Relax",   color: "#6F94A8" },
+  party:      { label: "Party",   color: "#D1688A" },
+  culture:    { label: "Culture", color: "#9B72CF" },
+  food:       { label: "Food",    color: "#C98A3A" },
+};
+
+const CATEGORY_ICON: Record<CategoryKey, LucideIcon> = {
+  indoor:     House,
+  outdoor:    TreePine,
+  sport:      Dumbbell,
+  relaxation: Flower2,
+  party:      PartyPopper,
+  culture:    Palette,
+  food:       UtensilsCrossed,
 };
 
 export interface CategoryChipProps {
@@ -38,6 +58,7 @@ export function CategoryChip({
   className,
 }: CategoryChipProps) {
   const meta = CATEGORY_META[category];
+  const Icon = CATEGORY_ICON[category];
 
   return (
     <button
@@ -58,7 +79,7 @@ export function CategoryChip({
       style={selected ? { backgroundColor: meta.color } : undefined}
       aria-pressed={selected}
     >
-      <span aria-hidden>{meta.emoji}</span>
+      <Icon size={14} strokeWidth={2.5} aria-hidden />
       {meta.label}
     </button>
   );
