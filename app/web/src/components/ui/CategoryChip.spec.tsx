@@ -1,11 +1,24 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { CategoryChip, CATEGORY_META, CategoryKey } from './CategoryChip'
 
+// Stub out lucide-react icons so Jest doesn't hit the React dual-instance
+// issue caused by lucide-react loading its own React copy from the root
+// node_modules. The chip's behaviour (labels, colours, aria, clicks) is
+// what matters here — not which specific SVG is rendered.
+jest.mock('lucide-react', () => ({
+  House:           () => <svg data-testid="icon" />,
+  TreePine:        () => <svg data-testid="icon" />,
+  Dumbbell:        () => <svg data-testid="icon" />,
+  Flower2:         () => <svg data-testid="icon" />,
+  PartyPopper:     () => <svg data-testid="icon" />,
+  Palette:         () => <svg data-testid="icon" />,
+  UtensilsCrossed: () => <svg data-testid="icon" />,
+}))
+
 describe('CategoryChip', () => {
-  it('renders the label and emoji from CATEGORY_META', () => {
+  it('renders the label from CATEGORY_META', () => {
     render(<CategoryChip category="indoor" />)
     expect(screen.getByText('Indoor')).toBeInTheDocument()
-    expect(screen.getByText('🏠')).toBeInTheDocument()
   })
 
   it('sets aria-pressed="false" when not selected', () => {
@@ -47,11 +60,10 @@ describe('CategoryChip', () => {
 })
 
 describe('CATEGORY_META', () => {
-  it('defines label, emoji, and color for every category key', () => {
+  it('defines label and color for every category key', () => {
     const expectedKeys: CategoryKey[] = ['indoor', 'outdoor', 'sport', 'relaxation', 'party', 'culture', 'food']
     expectedKeys.forEach(key => {
       expect(CATEGORY_META[key]).toHaveProperty('label')
-      expect(CATEGORY_META[key]).toHaveProperty('emoji')
       expect(CATEGORY_META[key]).toHaveProperty('color')
     })
   })
