@@ -19,13 +19,13 @@ interface Segment {
 
 /** Order is clockwise starting from the top edge (matches conic-gradient from 0deg). */
 const SEGMENTS: Segment[] = [
-  { Icon: House, color: "#E8643C" }, // indoor
-  { Icon: TreePine, color: "#7A9A52" }, // outdoor
-  { Icon: Dumbbell, color: "#F2A03D" }, // sport
-  { Icon: Flower2, color: "#6F94A8" }, // relaxation
-  { Icon: PartyPopper, color: "#D1688A" }, // party
-  { Icon: Palette, color: "#9B72CF" }, // culture
-  { Icon: UtensilsCrossed, color: "#C98A3A" }, // food
+  { Icon: House,          color: "#E8643C" }, // indoor
+  { Icon: TreePine,       color: "#7A9A52" }, // outdoor
+  { Icon: Dumbbell,       color: "#F2A03D" }, // sport
+  { Icon: Flower2,        color: "#6F94A8" }, // relaxation
+  { Icon: PartyPopper,    color: "#D1688A" }, // party
+  { Icon: Palette,        color: "#9B72CF" }, // culture
+  { Icon: UtensilsCrossed,color: "#C98A3A" }, // food
 ];
 
 const SLICE = 360 / SEGMENTS.length;
@@ -59,7 +59,6 @@ export function Wheel({
 
   useEffect(() => {
     if (spinning && !wasSpinning.current) {
-      // 5–7 full turns + random landing offset so it stops somewhere new each time.
       const turns = 5 + Math.floor(Math.random() * 3);
       const offset = Math.random() * 360;
       setRotation((r) => r + turns * 360 + offset);
@@ -87,7 +86,7 @@ export function Wheel({
 
       {/* Wheel disc */}
       <div
-        className="absolute inset-0 rounded-full border-[2.5px] border-ink shadow-sticker-lg"
+        className="absolute inset-0 rounded-full border-[3px] border-ink shadow-sticker-lg"
         style={{
           background: conicGradient(),
           transform: `rotate(${rotation}deg)`,
@@ -105,7 +104,7 @@ export function Wheel({
               className="absolute -translate-x-1/2 -translate-y-1/2"
               style={{ left: `${x}%`, top: `${y}%` }}
             >
-              <Icon size={26} strokeWidth={2.5} color="#FFFCF6" />
+              <Icon size={Math.round(size * 0.075)} strokeWidth={2.5} color="#FFFCF6" />
             </span>
           );
         })}
@@ -113,7 +112,7 @@ export function Wheel({
 
       {/* Center hub */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full bg-surface border-[2.5px] border-ink shadow-sticker-sm flex items-center justify-center overflow-hidden"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full bg-surface border-[3px] border-ink shadow-sticker-sm flex items-center justify-center overflow-hidden"
         style={{ width: size * 0.24, height: size * 0.24 }}
       >
         <Image
