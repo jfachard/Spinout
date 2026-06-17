@@ -21,5 +21,13 @@
   "license": "ISC",
   "devDependencies": {
     "turbo": "^2.9.16"
+  },
+  "overrides": {
+    "nativewind": {
+      "tailwindcss": "3.4.17"
+    },
+    "react-native-css-interop": {
+      "tailwindcss": "3.4.17"
+    }
   }
 }
