@@ -1,5 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
+import type { ActivityDto } from '@spinout/shared';
+
 import { apiFetch } from './api';
 import { authFetch, getAccessToken } from './auth';
 
@@ -59,6 +61,39 @@ export function createSession(categories: string[] = []) {
 
 export function fetchSession(code: string) {
   return apiFetch<Session>(`/session/${code.trim().toUpperCase()}`);
+}
+
+export async function storeSessionHistory(code: string, history: unknown) {
+  const key = `spinout.history.${code.trim().toUpperCase()}`;
+  await SecureStore.setItemAsync(key, JSON.stringify(history));
+}
+
+export async function getStoredSessionHistory<T = unknown>(code: string): Promise<T | null> {
+  const key = `spinout.history.${code.trim().toUpperCase()}`;
+  const raw = await SecureStore.getItemAsync(key);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+export interface HistorySpin {
+  id: string;
+  spinNumber: number;
+  result: string;
+  activity: ActivityDto;
+  votes: { value: boolean }[];
+}
+
+export interface SessionHistory {
+  session: { id: string; code: string; status: string };
+  spins: HistorySpin[];
+}
+
+export function fetchSessionHistory(code: string) {
+  return apiFetch<SessionHistory>(`/session/${code.trim().toUpperCase()}/history`);
 }
 
 export async function joinSession(code: string, guestName?: string) {

@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
 import { ApiError } from '@/lib/api';
-import { login as loginUser, storeTokens } from '@/lib/auth';
+import { fetchMe, login as loginUser, storeTokens, storeUsername } from '@/lib/auth';
 import { loginSchema, type LoginValues } from '@/lib/validation';
 
 export default function LoginScreen() {
@@ -35,6 +35,12 @@ export default function LoginScreen() {
     try {
       const tokens = await loginUser(values);
       await storeTokens(tokens);
+      try {
+        const me = await fetchMe();
+        await storeUsername(me.username);
+      } catch {
+        /* username sync optional */
+      }
       await refresh();
       router.replace('/');
     } catch (err) {

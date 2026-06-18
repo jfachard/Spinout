@@ -152,6 +152,30 @@ export class SessionService {
     return { session, spins }
   }
 
+  async setMemberPushToken(memberId: string, code: string, token: string) {
+    const member = await this.findMember(memberId, code)
+    if (!member) throw new NotFoundException('Member not found')
+
+    return this.prisma.sessionMember.update({
+      where: { id: memberId },
+      data: { expoPushToken: token },
+    })
+  }
+
+  async getMemberPushTokens(sessionId: string) {
+    const members = await this.prisma.sessionMember.findMany({
+      where: { sessionId },
+      include: { user: { select: { expoPushToken: true } } },
+    })
+
+    const tokens = new Set<string>()
+    for (const member of members) {
+      if (member.expoPushToken) tokens.add(member.expoPushToken)
+      if (member.user?.expoPushToken) tokens.add(member.user.expoPushToken)
+    }
+    return [...tokens]
+  }
+
   private generateCode(): string {
     return Math.random().toString(36).substring(2, 8).toUpperCase()
   }

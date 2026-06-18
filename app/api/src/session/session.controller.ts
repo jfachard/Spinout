@@ -20,6 +20,20 @@ class JoinSessionDto {
   guestName?: string
 }
 
+class MemberPushTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  memberId!: string
+
+  @IsString()
+  @IsNotEmpty()
+  code!: string
+
+  @IsString()
+  @IsNotEmpty()
+  token!: string
+}
+
 @Controller('session')
 export class SessionController {
   constructor(private session: SessionService) {}
@@ -34,6 +48,11 @@ export class SessionController {
   join(@Body() dto: JoinSessionDto, @Req() req: any) {
     const userId = req.user?.userId ?? undefined
     return this.session.join(dto.code, userId, dto.guestName)
+  }
+
+  @Post('members/push-token')
+  registerMemberPushToken(@Body() dto: MemberPushTokenDto) {
+    return this.session.setMemberPushToken(dto.memberId, dto.code, dto.token)
   }
 
   @Get(':code')

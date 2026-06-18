@@ -13,11 +13,19 @@ import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
 import { useAuth } from '@/contexts/AuthContext';
 import {
+  fetchMe,
+  getGuestDisplayName,
+  getStoredUsername,
+  storeGuestDisplayName,
+  storeUsername,
+} from '@/lib/auth';
+import {
   createErrorMessage,
   joinErrorMessage,
   parseJoinCode,
   SESSION_CODE_RE,
 } from '@/lib/join';
+import { syncSessionPushToken } from '@/lib/notifications';
 import {
   createSession,
   getMembership,
@@ -35,17 +43,35 @@ export default function HomeScreen() {
 
   const [joinOpen, setJoinOpen] = useState(false);
   const [joinCode, setJoinCode] = useState('');
-  const [joinGuestName, setJoinGuestName] = useState('');
+  const [joinDisplayName, setJoinDisplayName] = useState('');
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
 
   const [lastCode, setLastCode] = useState<string | null>(null);
 
+  const loadJoinDisplayName = useCallback(async () => {
+    if (isAuthenticated) {
+      try {
+        const me = await fetchMe();
+        await storeUsername(me.username);
+        setJoinDisplayName(me.username);
+        return;
+      } catch {
+        const cached = await getStoredUsername();
+        if (cached) setJoinDisplayName(cached);
+        return;
+      }
+    }
+    const guest = await getGuestDisplayName();
+    if (guest) setJoinDisplayName(guest);
+  }, [isAuthenticated]);
+
   const openJoinWithCode = useCallback((code: string) => {
     setJoinCode(code);
     setJoinOpen(true);
     setJoinError(null);
-  }, []);
+    void loadJoinDisplayName();
+  }, [loadJoinDisplayName]);
 
   useEffect(() => {
     getMembership().then((m) => setLastCode(m?.code ?? null));
@@ -89,6 +115,7 @@ export default function HomeScreen() {
       const hostMember = session.members?.[0];
       if (hostMember) {
         await storeMembership({ code: session.code, memberId: hostMember.id });
+        await syncSessionPushToken(session.code, hostMember.id);
       }
       router.replace('/(tabs)/lobby');
     } catch (err) {
@@ -105,22 +132,27 @@ export default function HomeScreen() {
       setJoinError('Code must be 6 characters (letters/numbers).');
       return;
     }
-    if (!isAuthenticated && joinGuestName.trim().length === 0) {
+    const displayName = joinDisplayName.trim();
+    if (!isAuthenticated && displayName.length === 0) {
       setJoinError('Enter a name to join as guest.');
       return;
     }
 
     setJoining(true);
     try {
+      if (!isAuthenticated) {
+        await storeGuestDisplayName(displayName);
+      }
       const { session, member } = await joinSession(
         normalized,
-        isAuthenticated ? undefined : joinGuestName.trim(),
+        isAuthenticated ? undefined : displayName,
       );
       await storeMembership({
         code: session.code,
         memberId: member.id,
         guestName: member.guestName ?? undefined,
       });
+      await syncSessionPushToken(session.code, member.id);
       router.replace('/(tabs)/lobby');
     } catch (err) {
       setJoinError(joinErrorMessage(err));
@@ -166,7 +198,13 @@ export default function HomeScreen() {
             variant="secondary"
             className="flex-1 px-4"
             textClassName="text-base"
-            onPress={() => setJoinOpen((v) => !v)}
+            onPress={() => {
+              setJoinOpen((v) => {
+                const next = !v;
+                if (next) void loadJoinDisplayName();
+                return next;
+              });
+            }}
           >
             Enter code
           </Button>
@@ -205,15 +243,20 @@ export default function HomeScreen() {
               </Pressable>
             </View>
 
-            {!isAuthenticated ? (
-              <Input
-                label="Your name (guest)"
-                value={joinGuestName}
-                onChangeText={setJoinGuestName}
-                maxLength={20}
-                placeholder="Alex"
-                autoCapitalize="words"
-              />
+            <Input
+              label={isAuthenticated ? 'Your name' : 'Your name (guest)'}
+              value={joinDisplayName}
+              onChangeText={setJoinDisplayName}
+              editable={!isAuthenticated}
+              maxLength={20}
+              placeholder="Alex"
+              autoCapitalize="words"
+              className={isAuthenticated ? 'text-subtle' : undefined}
+            />
+            {isAuthenticated ? (
+              <Text variant="body" weight="semibold" className="-mt-1 text-xs text-muted">
+                From your account — shown to the group in the lobby.
+              </Text>
             ) : null}
 
             {joinError ? (

@@ -9,6 +9,20 @@ import {
 import { Server, Socket } from 'socket.io'
 import { SessionService } from './session.service'
 import { LOBBY_EVENTS, SESSION_EVENTS } from '@spinout/shared'
+import { PushService } from '../push/push.service'
+
+function voteResultCopy(result: 'accepted' | 'rejected', activityTitle?: string) {
+  const title = result === 'accepted' ? "It's a yes!" : 'Not it'
+  const body =
+    result === 'accepted'
+      ? activityTitle
+        ? `${activityTitle} — let's go!`
+        : 'The group accepted the activity.'
+      : activityTitle
+        ? `${activityTitle} didn't make the cut.`
+        : 'The group passed on the activity.'
+  return { title, body }
+}
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SessionGateway implements OnGatewayDisconnect {
@@ -18,7 +32,10 @@ export class SessionGateway implements OnGatewayDisconnect {
   // memberId par socketId pour gérer les déconnexions
   private socketToMember = new Map<string, { memberId: string; sessionCode: string }>()
 
-  constructor(private session: SessionService) {}
+  constructor(
+    private session: SessionService,
+    private push: PushService,
+  ) {}
 
   async handleDisconnect(client: Socket) {
     const data = this.socketToMember.get(client.id)
@@ -118,6 +135,14 @@ export class SessionGateway implements OnGatewayDisconnect {
     client.to(`lobby:${data.sessionCode}`).emit(SESSION_EVENTS.STARTED)
 
     this.server.to(`lobby:${data.sessionCode}`).emit(SESSION_EVENTS.STARTED)
+
+    const tokens = await this.session.getMemberPushTokens(fullSession.id)
+    void this.push.sendToTokens(
+      tokens,
+      'Game on!',
+      'The host started the session. Time to spin!',
+      { type: 'session_started', code: data.sessionCode },
+    )
   }
 
   @SubscribeMessage(SESSION_EVENTS.SPIN)
@@ -165,11 +190,20 @@ export class SessionGateway implements OnGatewayDisconnect {
     if (result) {
       const spin = await this.session.getSessionHistory(body.sessionId)
       const currentSpin = spin.find(s => s.id === body.spinId)
+      const activityTitle = currentSpin?.activity?.title
 
       this.server.to(`session:${data.sessionCode}`).emit(SESSION_EVENTS.VOTE_RESULT, {
         result,
         activity: currentSpin?.activity,
         ...summary,
+      })
+
+      const tokens = await this.session.getMemberPushTokens(body.sessionId)
+      const { title, body: message } = voteResultCopy(result, activityTitle)
+      void this.push.sendToTokens(tokens, title, message, {
+        type: 'vote_result',
+        result,
+        code: data.sessionCode,
       })
     }
   }

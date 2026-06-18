@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
 import { ApiError } from '@/lib/api';
-import { register as registerUser, storeTokens } from '@/lib/auth';
+import { register as registerUser, storeTokens, storeUsername } from '@/lib/auth';
 import { registerSchema, type RegisterValues } from '@/lib/validation';
 
 export default function RegisterScreen() {
@@ -35,6 +35,7 @@ export default function RegisterScreen() {
     try {
       const tokens = await registerUser(values);
       await storeTokens(tokens);
+      await storeUsername(values.username);
       await refresh();
       router.replace('/');
     } catch (err) {

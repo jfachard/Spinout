@@ -1,8 +1,13 @@
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 
+import { GameProvider } from '@/contexts/GameContext';
+import { LobbyProvider } from '@/contexts/LobbyContext';
+
 export default function TabLayout() {
   return (
-    <NativeTabs tintColor="#E8643C" labelStyle={{ color: '#6B5B54' }}>
+    <LobbyProvider>
+      <GameProvider>
+      <NativeTabs tintColor="#E8643C" labelStyle={{ color: '#6B5B54' }}>
       <NativeTabs.Trigger name="lobby">
         <Icon sf={{ default: 'person.2', selected: 'person.2.fill' }} />
         <Label>Lobby</Label>
@@ -16,5 +21,7 @@ export default function TabLayout() {
         <Label>Recap</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
+      </GameProvider>
+    </LobbyProvider>
   );
 }

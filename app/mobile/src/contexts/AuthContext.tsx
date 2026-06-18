@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { getAccessToken } from '@/lib/auth';
+import { configureNotifications, registerPushTokenWithBackend, syncSessionPushToken } from '@/lib/notifications';
+import { getMembership } from '@/lib/session';
 
 type AuthContextValue = {
   isReady: boolean;
@@ -26,6 +28,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh().finally(() => setIsReady(true));
   }, [refresh]);
+
+  useEffect(() => {
+    if (!isReady) return;
+    void configureNotifications();
+    void getMembership().then((membership) => {
+      if (membership) {
+        void syncSessionPushToken(membership.code, membership.memberId).catch(() => {});
+      }
+    });
+  }, [isReady]);
+
+  useEffect(() => {
+    if (!isReady || !isAuthenticated) return;
+    void registerPushTokenWithBackend().catch(() => {});
+  }, [isReady, isAuthenticated]);
 
   const value = useMemo(
     () => ({ isReady, isAuthenticated, refresh }),

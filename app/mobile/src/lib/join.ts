@@ -1,6 +1,18 @@
+import * as Linking from 'expo-linking';
+
 import { ApiError } from './api';
 
 export const SESSION_CODE_RE = /^[A-Z0-9]{6}$/;
+
+/** Web join link for QR / share — matches web `origin/?join=CODE`. */
+export function getJoinUrl(code: string): string {
+  const normalized = code.trim().toUpperCase();
+  const webUrl = process.env.EXPO_PUBLIC_WEB_URL?.replace(/\/$/, '');
+  if (webUrl) {
+    return `${webUrl}/?join=${normalized}`;
+  }
+  return Linking.createURL('/', { queryParams: { join: normalized } });
+}
 
 /** Parses QR payloads (`https://…/?join=SUNSET`) or raw 6-char codes. */
 export function parseJoinCode(raw: string): string | null {

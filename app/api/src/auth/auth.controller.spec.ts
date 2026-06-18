@@ -19,6 +19,8 @@ describe('AuthController', () => {
       verifyRefreshToken: jest.fn(),
       findUserById: jest.fn(),
       logout: jest.fn(),
+      setPushToken: jest.fn(),
+      getMe: jest.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -88,6 +90,23 @@ describe('AuthController', () => {
       auth.logout.mockResolvedValue(undefined)
       await controller.logout({ user: { userId: 'u1' } } as any)
       expect(auth.logout).toHaveBeenCalledWith('u1')
+    })
+  })
+
+  describe('pushToken', () => {
+    it('delegates to auth.setPushToken', async () => {
+      auth.setPushToken.mockResolvedValue(undefined)
+      await controller.pushToken({ user: { userId: 'u1' } } as any, { token: 'ExponentPushToken[abc]' })
+      expect(auth.setPushToken).toHaveBeenCalledWith('u1', 'ExponentPushToken[abc]')
+    })
+  })
+
+  describe('me', () => {
+    it('delegates to auth.getMe', async () => {
+      auth.getMe.mockResolvedValue(fakeUser)
+      const result = await controller.me({ user: { userId: 'u1' } } as any)
+      expect(auth.getMe).toHaveBeenCalledWith('u1')
+      expect(result).toEqual(fakeUser)
     })
   })
 })

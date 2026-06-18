@@ -4,6 +4,14 @@ import { apiFetch, ApiError } from './api';
 
 const ACCESS_TOKEN_KEY = 'spinout.accessToken';
 const REFRESH_TOKEN_KEY = 'spinout.refreshToken';
+const USERNAME_KEY = 'spinout.username';
+const GUEST_NAME_KEY = 'spinout.guestName';
+
+export interface AuthUser {
+  id: string;
+  username: string;
+  email: string;
+}
 
 export interface AuthTokens {
   accessToken: string;
@@ -42,6 +50,27 @@ export async function getRefreshToken(): Promise<string | null> {
 export async function clearTokens() {
   await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
   await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(USERNAME_KEY);
+}
+
+export async function storeUsername(username: string) {
+  await SecureStore.setItemAsync(USERNAME_KEY, username);
+}
+
+export async function getStoredUsername(): Promise<string | null> {
+  return SecureStore.getItemAsync(USERNAME_KEY);
+}
+
+export async function storeGuestDisplayName(name: string) {
+  await SecureStore.setItemAsync(GUEST_NAME_KEY, name.trim());
+}
+
+export async function getGuestDisplayName(): Promise<string | null> {
+  return SecureStore.getItemAsync(GUEST_NAME_KEY);
+}
+
+export async function fetchMe() {
+  return authFetch<AuthUser>('/auth/me');
 }
 
 function withBearer(options: RequestInit, token: string): RequestInit {
