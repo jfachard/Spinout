@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { SessionGateway } from './session.gateway'
 import { SessionService } from './session.service'
+import { PushService } from '../push/push.service'
 
 jest.mock('@spinout/shared', () => ({
   LOBBY_EVENTS: {
@@ -59,6 +60,11 @@ const mockSession = {
   resolveVote: jest.fn(),
   getSessionHistory: jest.fn(),
   close: jest.fn(),
+  getMemberPushTokens: jest.fn().mockResolvedValue([]),
+}
+
+const mockPush = {
+  sendToTokens: jest.fn().mockResolvedValue(undefined),
 }
 
 const makeSocket = (id: string) => ({
@@ -73,11 +79,13 @@ describe('SessionGateway', () => {
 
   beforeEach(async () => {
     Object.values(mockSession).forEach(fn => fn.mockReset())
+    mockPush.sendToTokens.mockReset()
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SessionGateway,
         { provide: SessionService, useValue: mockSession },
+        { provide: PushService, useValue: mockPush },
       ],
     }).compile()
 

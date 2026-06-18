@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ThrottlerGuard } from '@nestjs/throttler'
 import { AuthService } from './auth.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
+import { PushTokenDto } from './dto/push-token.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Controller('auth')
@@ -37,5 +38,17 @@ export class AuthController {
   @Post('logout')
   logout(@Req() req: any) {
     return this.auth.logout(req.user.userId)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('push-token')
+  pushToken(@Req() req: any, @Body() dto: PushTokenDto) {
+    return this.auth.setPushToken(req.user.userId, dto.token)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@Req() req: any) {
+    return this.auth.getMe(req.user.userId)
   }
 }

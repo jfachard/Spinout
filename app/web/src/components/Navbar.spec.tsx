@@ -1,8 +1,26 @@
 import { render, screen } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { Navbar } from './Navbar'
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
+}))
+
+jest.mock('next/link', () => ({
+  __esModule: true,
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string
+    children: ReactNode
+    className?: string
+  }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
 }))
 
 jest.mock('next/image', () => ({

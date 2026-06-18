@@ -125,13 +125,41 @@ describe('AuthService', () => {
   })
 
   describe('logout', () => {
-    it('increments tokenVersion for the user', async () => {
+    it('increments tokenVersion and clears push token', async () => {
       prisma.user.update.mockResolvedValue({})
       await service.logout('user-1')
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { tokenVersion: { increment: 1 } },
+        data: { tokenVersion: { increment: 1 }, expoPushToken: null },
       })
+    })
+  })
+
+  describe('setPushToken', () => {
+    it('stores the expo push token on the user', async () => {
+      prisma.user.update.mockResolvedValue({})
+      await service.setPushToken('user-1', 'ExponentPushToken[abc]')
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { expoPushToken: 'ExponentPushToken[abc]' },
+      })
+    })
+  })
+
+  describe('getMe', () => {
+    it('returns public user fields', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+      })
+      const result = await service.getMe('user-1')
+      expect(result).toEqual({ id: 'user-1', username: 'alice', email: 'alice@example.com' })
+    })
+
+    it('throws when user is missing', async () => {
+      prisma.user.findUnique.mockResolvedValue(null)
+      await expect(service.getMe('missing')).rejects.toThrow(UnauthorizedException)
     })
   })
 })
