@@ -1,6 +1,6 @@
 const path = require('path');
 
-require('./tailwind-resolve.cjs');
+const { tailwindRoot } = require('./tailwind-resolve.cjs');
 
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
@@ -20,7 +20,7 @@ config.resolver.blockList = [/app[\\/]web[\\/].*/];
 config.resolver.extraNodeModules = {
   react: path.resolve(projectRoot, 'node_modules/react'),
   'react-native': path.resolve(projectRoot, 'node_modules/react-native'),
-  tailwindcss: path.resolve(projectRoot, 'node_modules/tailwindcss'),
+  tailwindcss: tailwindRoot,
 };
 
 module.exports = withNativeWind(config, {

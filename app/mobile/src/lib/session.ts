@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 import { apiFetch } from './api';
-import { authFetch } from './auth';
+import { authFetch, getAccessToken } from './auth';
 
 export interface SessionMember {
   id: string;
@@ -61,9 +61,12 @@ export function fetchSession(code: string) {
   return apiFetch<Session>(`/session/${code.trim().toUpperCase()}`);
 }
 
-export function joinSession(code: string, guestName?: string) {
+export async function joinSession(code: string, guestName?: string) {
   const normalizedCode = code.trim().toUpperCase();
   const body = JSON.stringify({ code: normalizedCode, guestName });
+  const hasToken = (await getAccessToken()) !== null;
 
-  return authFetch<JoinResponse>('/session/join', { method: 'POST', body });
+  return hasToken
+    ? authFetch<JoinResponse>('/session/join', { method: 'POST', body })
+    : apiFetch<JoinResponse>('/session/join', { method: 'POST', body });
 }

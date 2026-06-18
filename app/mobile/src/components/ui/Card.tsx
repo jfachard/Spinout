@@ -10,7 +10,7 @@ export interface CardProps extends ViewProps {
 export function Card({ className, style, children, ...props }: CardProps) {
   return (
     <View
-      className={cn('rounded-xl border-[2.5px] border-ink bg-surface', className)}
+      className={cn('rounded-[20px] border-[2.5px] border-ink bg-surface', className)}
       style={[stickerShadow('md'), style]}
       {...props}
     >

@@ -27,9 +27,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isReady) return;
 
-    const inAuthGroup = segments[0] === 'auth';
+    const root = segments[0];
+    const onHome = !root;
+    const inTabs = root === '(tabs)';
+    const inAuthGroup = root === 'auth';
+    const inSession = root === 'session';
+    const inJoin = root === 'join';
+    const isPublic = onHome || inTabs || inAuthGroup || inSession || inJoin;
 
-    if (!isAuthenticated && !inAuthGroup) {
+    if (!isAuthenticated && !isPublic) {
       router.replace('/auth/login');
     } else if (isAuthenticated && inAuthGroup) {
       router.replace('/');
@@ -55,7 +61,13 @@ function RootNavigation() {
           headerShown: false,
           contentStyle: { backgroundColor: '#fbf3e4' },
         }}
-      />
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="join" />
+        <Stack.Screen name="session" />
+      </Stack>
     </AuthGuard>
   );
 }

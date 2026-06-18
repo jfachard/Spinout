@@ -20,6 +20,8 @@ module.exports = {
         'category-party': '#d1688a',
         'category-culture': '#9b72cf',
         'category-food': '#c98a3a',
+        success: '#7a9a52',
+        danger: '#c9533a',
       },
       borderRadius: {
         sm: 10,

@@ -1,27 +1,30 @@
-import { ActivityIndicator, type PressableProps } from 'react-native';
+import { ActivityIndicator, View, type PressableProps } from 'react-native';
 
 import { cn } from '@/lib/utils';
 import { Text } from '@/components/ui/Text';
 import { StickerPressable } from '@/components/ui/StickerPressable';
 
-export type ButtonVariant = 'primary' | 'secondary';
+export type ButtonVariant = 'primary' | 'secondary' | 'dark';
 
 export interface ButtonProps extends Omit<PressableProps, 'children'> {
   variant?: ButtonVariant;
   loading?: boolean;
   className?: string;
   textClassName?: string;
+  icon?: React.ReactNode;
   children: string;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-primary',
   secondary: 'bg-surface',
+  dark: 'bg-ink',
 };
 
 const variantTextClasses: Record<ButtonVariant, string> = {
   primary: 'text-white',
   secondary: 'text-ink',
+  dark: 'text-white',
 };
 
 export function Button({
@@ -30,6 +33,7 @@ export function Button({
   disabled,
   className,
   textClassName,
+  icon,
   children,
   ...props
 }: ButtonProps) {
@@ -39,7 +43,7 @@ export function Button({
     <StickerPressable
       disabled={isDisabled}
       className={cn(
-        'items-center justify-center rounded-lg border-[2.5px] border-ink px-6 py-3',
+        'flex-row items-center justify-center gap-2 rounded-2xl border-[2.5px] border-ink px-6 py-4',
         variantClasses[variant],
         isDisabled && 'opacity-50',
         className,
@@ -47,15 +51,18 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#fff' : '#3a2a24'} />
+        <ActivityIndicator color={variant === 'secondary' ? '#3a2a24' : '#fff'} />
       ) : (
-        <Text
-          variant="display"
-          weight="bold"
-          className={cn('text-lg', variantTextClasses[variant], textClassName)}
-        >
-          {children}
-        </Text>
+        <>
+          {icon}
+          <Text
+            variant="display"
+            weight="bold"
+            className={cn('text-lg', variantTextClasses[variant], textClassName)}
+          >
+            {children}
+          </Text>
+        </>
       )}
     </StickerPressable>
   );

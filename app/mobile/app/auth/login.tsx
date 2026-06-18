@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { BrandLogo } from '@/components/BrandLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { Screen } from '@/components/Screen';
 import { ApiStatus } from '@/components/ui/ApiStatus';
@@ -49,10 +50,11 @@ export default function LoginScreen() {
 
   return (
     <Screen scroll centered contentClassName="gap-5">
+      <BrandLogo className="mb-2 self-center" />
       <Card className="w-full max-w-md self-center">
         <CardContent className="gap-6 p-7">
           <View className="gap-1">
-            <Text variant="display" weight="bold" className="text-3xl text-ink">
+            <Text variant="display" weight="extrabold" className="text-3xl text-ink">
               Welcome back
             </Text>
             <Text variant="body" className="text-subtle">

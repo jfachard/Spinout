@@ -22,3 +22,20 @@ export const loginSchema = z.object({
 
 export type RegisterValues = z.infer<typeof registerSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
+
+export const SESSION_CODE_RE = /^[A-Z0-9]{6}$/;
+
+export const joinSchema = z.object({
+  code: z
+    .string()
+    .transform((v) => v.trim().toUpperCase())
+    .refine((v) => SESSION_CODE_RE.test(v), 'Code must be 6 characters (letters/numbers).'),
+  guestName: z
+    .string()
+    .max(20, '20 characters max')
+    .transform((v) => v.trim())
+    .refine((v) => v.length > 0, 'Enter a name to join as guest.')
+    .optional(),
+});
+
+export type JoinValues = z.infer<typeof joinSchema>;

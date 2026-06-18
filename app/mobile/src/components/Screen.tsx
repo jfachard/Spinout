@@ -21,7 +21,7 @@ export function Screen({
   const body = (
     <View
       className={cn(
-        'flex-1 bg-paper px-4 py-6',
+        'flex-1 bg-paper px-5 py-4',
         centered && 'justify-center',
         contentClassName,
       )}
@@ -40,7 +40,11 @@ export function Screen({
         {scroll ? (
           <ScrollView
             className="flex-1 bg-paper"
-            contentContainerClassName={cn('grow px-4 py-6', centered && 'justify-center')}
+            contentContainerClassName={cn(
+              'grow px-5 py-4 pb-8',
+              centered && 'justify-center',
+              contentClassName,
+            )}
             keyboardShouldPersistTaps="handled"
           >
             {children}

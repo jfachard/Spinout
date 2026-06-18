@@ -1,53 +1,259 @@
-import { Link, Stack } from 'expo-router';
-import { View } from 'react-native';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { Camera, Sun } from 'lucide-react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Pressable, View } from 'react-native';
 
+import { BrandLogo } from '@/components/BrandLogo';
+import { HeroWheel } from '@/components/HeroWheel';
 import { Screen } from '@/components/Screen';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  createErrorMessage,
+  joinErrorMessage,
+  parseJoinCode,
+  SESSION_CODE_RE,
+} from '@/lib/join';
+import {
+  createSession,
+  getMembership,
+  joinSession,
+  storeMembership,
+} from '@/lib/session';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { join: joinParam } = useLocalSearchParams<{ join?: string }>();
+  const { isAuthenticated } = useAuth();
+
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [joinGuestName, setJoinGuestName] = useState('');
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+
+  const [lastCode, setLastCode] = useState<string | null>(null);
+
+  const openJoinWithCode = useCallback((code: string) => {
+    setJoinCode(code);
+    setJoinOpen(true);
+    setJoinError(null);
+  }, []);
+
+  useEffect(() => {
+    getMembership().then((m) => setLastCode(m?.code ?? null));
+  }, []);
+
+  useEffect(() => {
+    if (typeof joinParam === 'string') {
+      const code = parseJoinCode(joinParam);
+      if (code) openJoinWithCode(code);
+    }
+  }, [joinParam, openJoinWithCode]);
+
+  useEffect(() => {
+    const handleUrl = ({ url }: { url: string }) => {
+      const parsed = Linking.parse(url);
+      const join = parsed.queryParams?.join;
+      if (typeof join === 'string') {
+        const code = parseJoinCode(join);
+        if (code) openJoinWithCode(code);
+      }
+    };
+
+    Linking.getInitialURL().then((url) => {
+      if (url) handleUrl({ url });
+    });
+
+    const sub = Linking.addEventListener('url', handleUrl);
+    return () => sub.remove();
+  }, [openJoinWithCode]);
+
+  async function handleCreate() {
+    setCreateError(null);
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const session = await createSession([]);
+      const hostMember = session.members?.[0];
+      if (hostMember) {
+        await storeMembership({ code: session.code, memberId: hostMember.id });
+      }
+      router.replace('/(tabs)/lobby');
+    } catch (err) {
+      setCreateError(createErrorMessage(err));
+      setCreating(false);
+    }
+  }
+
+  async function handleJoin() {
+    setJoinError(null);
+
+    const normalized = joinCode.trim().toUpperCase();
+    if (!SESSION_CODE_RE.test(normalized)) {
+      setJoinError('Code must be 6 characters (letters/numbers).');
+      return;
+    }
+    if (!isAuthenticated && joinGuestName.trim().length === 0) {
+      setJoinError('Enter a name to join as guest.');
+      return;
+    }
+
+    setJoining(true);
+    try {
+      const { session, member } = await joinSession(
+        normalized,
+        isAuthenticated ? undefined : joinGuestName.trim(),
+      );
+      await storeMembership({
+        code: session.code,
+        memberId: member.id,
+        guestName: member.guestName ?? undefined,
+      });
+      router.replace('/(tabs)/lobby');
+    } catch (err) {
+      setJoinError(joinErrorMessage(err));
+      setJoining(false);
+    }
+  }
+
   return (
-    <Screen scroll>
-      <Stack.Screen options={{ title: 'Spinout' }} />
+    <Screen scroll contentClassName="pb-4">
+      <BrandLogo className="mt-1.5" />
 
-      <View className="gap-6">
-        <View className="gap-2">
-          <Text variant="display" weight="extrabold" className="text-4xl leading-tight text-ink">
-            Stop asking{'\n'}&ldquo;what do we{'\n'}wanna do?&rdquo;
+      <View className="mt-6">
+        <Badge>
+          <Sun size={14} color="#3A2A24" strokeWidth={2.5} />
+          <Text variant="body" weight="extrabold" className="text-xs text-ink">
+            tonight&apos;s plan, sorted
           </Text>
-          <Text variant="body" className="text-lg text-subtle">
-            Gather your crew, spin the wheel, and let fate pick the plan.
+        </Badge>
+
+        <Text
+          variant="display"
+          weight="extrabold"
+          className="mt-4 text-[40px] leading-[48px] text-ink"
+        >
+          Let the wheel{'\n'}decide.
+        </Text>
+        <Text variant="body" weight="semibold" className="mt-3 text-[15px] leading-6 text-subtle">
+          Round up the crew, give it a spin, and just go. Voting included.
+        </Text>
+      </View>
+
+      <View className="my-8 items-center">
+        <HeroWheel />
+      </View>
+
+      <View className="gap-3">
+        <Button loading={creating} onPress={handleCreate} className="w-full">
+          {creating ? 'Creating…' : 'Create a session'}
+        </Button>
+
+        <View className="flex-row gap-3">
+          <Button
+            variant="secondary"
+            className="flex-1 px-4"
+            textClassName="text-base"
+            onPress={() => setJoinOpen((v) => !v)}
+          >
+            Enter code
+          </Button>
+          <Button
+            variant="dark"
+            className="flex-1 px-4"
+            textClassName="text-base"
+            icon={<Camera size={18} color="#fff" strokeWidth={2.5} />}
+            onPress={() => router.push('/join/scan')}
+          >
+            Scan
+          </Button>
+        </View>
+
+        {joinOpen ? (
+          <View className="gap-3 pt-1">
+            <View className="flex-row items-center gap-3 rounded-2xl border-[2.5px] border-dashed border-[#C9B6A1] bg-surface px-4 py-3">
+              <Input
+                value={joinCode}
+                onChangeText={(v) => setJoinCode(v.toUpperCase())}
+                placeholder="SUNSET"
+                maxLength={6}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                containerClassName="flex-1 gap-0"
+                className="border-0 bg-transparent px-0 py-0 font-display text-lg tracking-widest"
+              />
+              <Pressable
+                onPress={handleJoin}
+                disabled={joining}
+                className="rounded-xl border-[2.5px] border-ink bg-ink px-4 py-2 opacity-100 disabled:opacity-50"
+              >
+                <Text variant="display" weight="bold" className="text-sm text-paper">
+                  {joining ? '…' : 'Go →'}
+                </Text>
+              </Pressable>
+            </View>
+
+            {!isAuthenticated ? (
+              <Input
+                label="Your name (guest)"
+                value={joinGuestName}
+                onChangeText={setJoinGuestName}
+                maxLength={20}
+                placeholder="Alex"
+                autoCapitalize="words"
+              />
+            ) : null}
+
+            {joinError ? (
+              <Text variant="body" weight="bold" className="text-sm text-primary">
+                {joinError}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+
+        {createError ? (
+          <Text variant="body" weight="bold" className="text-sm text-primary">
+            {createError}
           </Text>
-        </View>
+        ) : null}
 
-        <View className="gap-3">
-          <Button>Create a session</Button>
-          <Button variant="secondary">Join with a code</Button>
-        </View>
+        {lastCode ? (
+          <Link href="/(tabs)/recap" asChild>
+            <Pressable className="py-1">
+              <Text variant="body" weight="bold" className="text-center text-sm text-muted">
+                View last session recap ({lastCode})
+              </Text>
+            </Pressable>
+          </Link>
+        ) : null}
 
-        <View className="flex-row flex-wrap gap-3">
-          {[
-            { title: 'Spin the wheel', desc: 'Fate picks the activity.' },
-            { title: 'Everyone votes', desc: 'Yes or no, live.' },
-            { title: 'Just go', desc: 'No more debating.' },
-          ].map((feature) => (
-            <Card key={feature.title} className="min-w-[140px] flex-1">
-              <CardContent className="gap-1.5 p-4">
-                <Text variant="display" weight="bold" className="text-ink">
-                  {feature.title}
+        {!isAuthenticated ? (
+          <View className="flex-row flex-wrap justify-center gap-1 py-1">
+            <Text variant="body" weight="semibold" className="text-subtle">
+              Have an account?
+            </Text>
+            <Link href="/auth/login" asChild>
+              <Pressable>
+                <Text variant="body" weight="bold" className="text-primary">
+                  Log in
                 </Text>
-                <Text variant="body" className="text-sm text-subtle">
-                  {feature.desc}
-                </Text>
-              </CardContent>
-            </Card>
-          ))}
-        </View>
-
-        <Link href="/session/DEMO01/lobby" asChild>
-          <Button variant="secondary">Demo lobby (DEMO01)</Button>
-        </Link>
+              </Pressable>
+            </Link>
+          </View>
+        ) : null}
       </View>
     </Screen>
   );
