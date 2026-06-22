@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import {
   Dumbbell,
   Flower2,
@@ -11,6 +10,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Spinmark } from "@/components/Spinmark";
 
 interface Segment {
   Icon: LucideIcon;
@@ -112,16 +112,10 @@ export function Wheel({
 
       {/* Center hub */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full bg-surface border-[3px] border-ink shadow-sticker-sm flex items-center justify-center overflow-hidden"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center overflow-visible"
         style={{ width: size * 0.24, height: size * 0.24 }}
       >
-        <Image
-          src="/Spinout_logo.png"
-          alt="Spinout"
-          width={Math.round(size * 0.2)}
-          height={Math.round(size * 0.2)}
-          className="object-contain"
-        />
+        <Spinmark size={Math.round(size * 0.24)} showPointer={false} />
       </div>
     </div>
   );

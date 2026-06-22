@@ -72,10 +72,9 @@ describe('Navbar', () => {
     expect(lobbyLink).not.toHaveClass('bg-ink')
   })
 
-  it('renders the Spinout logo and brand name', () => {
+  it('renders the Spinout brand name', () => {
     mockUsePathname.mockReturnValue('/')
     render(<Navbar />)
-    expect(screen.getByAltText('Spinout')).toBeInTheDocument()
     expect(screen.getByText('Spinout')).toBeInTheDocument()
   })
 })
