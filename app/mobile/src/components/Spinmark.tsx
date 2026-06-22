@@ -20,6 +20,17 @@ const SLICE_PATHS = [
   'M0 0 L-173 -100 A200 200 0 0 1 0 -200 Z',
 ];
 
+const VB_W = 104;
+const VB_H = 118;
+const WHEEL_CX = 52;
+const WHEEL_CY = 64;
+const WHEEL_R = 52;
+const HUB_R = 17;
+const PATH_SCALE = 0.26;
+const SLICE_STROKE = 14;
+const WHEEL_BORDER = 3.5;
+const HUB_BORDER = 3;
+
 type SpinmarkProps = {
   size?: number;
   showPointer?: boolean;
@@ -28,37 +39,31 @@ type SpinmarkProps = {
 
 /** Rainbow wheel + cream hub (+ optional pointer). Matches brand/spinmark.svg. */
 export function Spinmark({ size = 36, showPointer = true, showShadow = false }: SpinmarkProps) {
-  const wheel = size * (104 / 118);
-  const scale = wheel / 208;
-  const cx = size / 2;
-  const cy = showPointer ? size - wheel / 2 : size / 2;
-  const r = wheel / 2;
-  const hubR = r * (17 / 52);
-  const border = Math.max(1.5, wheel * (3.5 / 104));
-  const hubBorder = Math.max(1.25, wheel * (3 / 104));
-  const sliceStroke = 14 * (r / 52);
-  const pointerW = wheel * (11 / 104);
-  const pointerH = wheel * (18 / 104);
-  const pointerTop = cy - r - (showPointer ? wheel * (12 / 104) : 0);
+  const height = size;
+  const width = showPointer ? size * (VB_W / VB_H) : size;
+  const viewBox = showPointer
+    ? `0 0 ${VB_W} ${VB_H}`
+    : `${WHEEL_CX - WHEEL_R} ${WHEEL_CY - WHEEL_R} ${WHEEL_R * 2} ${WHEEL_R * 2}`;
 
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <Svg width={width} height={height} viewBox={viewBox}>
       {showShadow ? (
-        <Circle cx={cx + r * 0.04} cy={cy + r * 0.04} r={r} fill={INK} />
+        <G transform={`translate(${WHEEL_CX + 4} ${WHEEL_CY + 4})`}>
+          <Circle r={WHEEL_R} fill={INK} />
+        </G>
       ) : null}
       {showPointer ? (
-        <Polygon
-          points={`${cx},${pointerTop} ${cx - pointerW},${pointerTop + pointerH} ${cx + pointerW},${pointerTop + pointerH}`}
-          fill={INK}
-        />
+        <Polygon points="52,0 41,18 63,18" fill={INK} />
       ) : null}
-      <G transform={`translate(${cx} ${cy}) scale(${scale})`}>
-        {SLICE_PATHS.map((d, i) => (
-          <Path key={i} d={d} fill={SEGMENTS[i]} stroke={INK} strokeWidth={sliceStroke} />
-        ))}
+      <G transform={`translate(${WHEEL_CX} ${WHEEL_CY})`}>
+        <G transform={`scale(${PATH_SCALE})`} stroke={INK} strokeWidth={SLICE_STROKE}>
+          {SLICE_PATHS.map((d, i) => (
+            <Path key={i} d={d} fill={SEGMENTS[i]} />
+          ))}
+        </G>
+        <Circle r={WHEEL_R} fill="none" stroke={INK} strokeWidth={WHEEL_BORDER} />
+        <Circle r={HUB_R} fill={CREAM} stroke={INK} strokeWidth={HUB_BORDER} />
       </G>
-      <Circle cx={cx} cy={cy} r={r} fill="none" stroke={INK} strokeWidth={border} />
-      <Circle cx={cx} cy={cy} r={hubR} fill={CREAM} stroke={INK} strokeWidth={hubBorder} />
     </Svg>
   );
 }
