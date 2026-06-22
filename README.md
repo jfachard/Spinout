@@ -184,22 +184,22 @@ Key design decisions:
 - [x] Shared TypeScript types and Socket.io event constants (`@spinout/shared`)
 
 ### 🚧 Milestone 2 — Web (Next.js)
-- [ ] Auth pages (register / login)
-- [ ] Home page (create / join session)
-- [ ] Lobby page (members, preferences, QR code)
-- [ ] Game page (roulette animation, vote panel)
-- [ ] Session history page
+- [x] Auth pages (register / login)
+- [x] Home page (create / join session)
+- [x] Lobby page (members, preferences, QR code)
+- [x] Game page (roulette animation, vote panel)
+- [x] Session history page
 
 ### 🔲 Milestone 3 — Mobile (Expo)
-- [ ] Navigation setup (Expo Router)
-- [ ] Home screen (create / join / QR scanner)
-- [ ] Lobby screen
-- [ ] Game screen (roulette + vote)
-- [ ] Push notifications
+- [x] Navigation setup (Expo Router)
+- [x] Home screen (create / join / QR scanner)
+- [x] Lobby screen
+- [x] Game screen (roulette + vote)
+- [x] Push notifications
 
 ### 🔲 Milestone 4 — Shared & DevOps
-- [ ] Deploy API on Railway
-- [ ] Deploy web on Vercel
+- [x] Deploy API on Railway
+- [x] Deploy web on Vercel
 
 ---
 
