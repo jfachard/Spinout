@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { Spinmark } from "@/components/Spinmark";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -28,14 +28,8 @@ export function Navbar() {
     >
       <div className="max-w-[1120px] mx-auto px-4 sm:px-7 py-3 flex items-center gap-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="flex items-center justify-center w-9 h-9 overflow-hidden">
-            <Image
-              src="/Spinout_logo.png"
-              alt="Spinout"
-              width={28}
-              height={28}
-              className="object-contain"
-            />
+          <span className="flex items-center justify-center w-9 h-9 overflow-visible">
+            <Spinmark size={34} showShadow />
           </span>
           <span className="text-xl font-display font-extrabold text-ink">
             Spinout

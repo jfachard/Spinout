@@ -1,0 +1,28 @@
+<svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spinout app icon">
+  <title>Spinout app icon</title>
+  <defs>
+    <radialGradient id="tile-bg" cx="50%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#F2A03D"/>
+      <stop offset="72%" stop-color="#E8643C"/>
+    </radialGradient>
+  </defs>
+  <!-- sticker shadow -->
+  <rect x="8" y="8" width="120" height="120" rx="30" fill="#3A2A24"/>
+  <!-- tile -->
+  <rect x="3" y="3" width="122" height="122" rx="30" fill="url(#tile-bg)" stroke="#3A2A24" stroke-width="3"/>
+  <!-- pointer -->
+  <polygon points="64,8 55,23 73,23" fill="#3A2A24"/>
+  <!-- wheel -->
+  <g transform="translate(64 68)">
+    <g transform="scale(0.21)" stroke="#3A2A24" stroke-width="14">
+      <path d="M0 0 L0 -200 A200 200 0 0 1 173 -100 Z" fill="#E8643C"/>
+      <path d="M0 0 L173 -100 A200 200 0 0 1 173 100 Z" fill="#7A9A52"/>
+      <path d="M0 0 L173 100 A200 200 0 0 1 0 200 Z" fill="#F2A03D"/>
+      <path d="M0 0 L0 200 A200 200 0 0 1 -173 100 Z" fill="#6F94A8"/>
+      <path d="M0 0 L-173 100 A200 200 0 0 1 -173 -100 Z" fill="#D1688A"/>
+      <path d="M0 0 L-173 -100 A200 200 0 0 1 0 -200 Z" fill="#C98A3A"/>
+    </g>
+    <circle r="42" fill="none" stroke="#3A2A24" stroke-width="3"/>
+    <circle r="13" fill="#FBF3E4" stroke="#3A2A24" stroke-width="3"/>
+  </g>
+</svg>

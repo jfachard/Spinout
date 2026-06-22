@@ -9,12 +9,11 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, Image, View } from 'react-native';
+import { Animated, Easing, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
+import { Spinmark } from '@/components/Spinmark';
 import { colors } from '@/theme/tokens';
-
-import logo from '../../assets/Spinout_logo.png';
 
 const SEGMENTS: { Icon: LucideIcon; color: string }[] = [
   { Icon: House, color: '#E8643C' },
@@ -184,19 +183,11 @@ export function GameWheel({ size = 240, spinning = false, durationMs = 4000 }: G
           style={{
             width: hubSize,
             height: hubSize,
-            borderRadius: hubSize / 2,
-            borderWidth: BORDER,
-            borderColor: colors.ink,
-            backgroundColor: colors.paper,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Image
-            source={logo}
-            style={{ width: size * 0.16, height: size * 0.16 }}
-            resizeMode="contain"
-          />
+          <Spinmark size={hubSize} showPointer={false} />
         </View>
       </View>
     </View>
